@@ -71,8 +71,7 @@ def welcomeScreen():
                                                                           __/ |             
                                                                          |___/          """)
 def userMenu():
-		
-		print("                                       MAIN MENU                               ")
+		print("\n\n                                       MAIN MENU                               \n\n")
 		print("1) Total Cases (All states)")
 		print("2) Negative Tests (All states)")
 		print("3) Currently Hospitalized (All states)")
@@ -92,14 +91,18 @@ def displayData(choice, statesList):
 	if choice == '1':
 		for s in statesList:
 			print(s.state + ": "  + s.positiveCases)
+		yesOrNo = input("Would you like to receive an email with this information? (Y/N): ").lower()
+		if yesOrNo == "y":
+			message = ''
+			for s in statesList:
+				message += (s.state + ": " + s.positiveCases + " cases as of " + s.date + '\n')
+			receiver_email = input("Please enter your email: ")
+			sendEmail(statesList, receiver_email, message)
+ 
 
-def sendEmail(statesList):
-	for s in statesList:
-		if s.state == "OR":
-			message = (s.state + ": " + s.positiveCases + " cases in Oregon on " + s.date)
-
+def sendEmail(statesList, receiver_email, message):
 	sender_email = "TheCovid19Analyzer@gmail.com"
-	receiver_email = "danielmcjones@gmail.com"
+	receiver_email = receiver_email
 	password = "Nocovid4me2"
 	s = smtplib.SMTP(host='smtp.gmail.com', port=587)
 	s.starttls()
@@ -124,7 +127,6 @@ def main():
 	while choice != '0':
 		choice = userMenu() 
 		displayData(choice, statesList)
-		sendEmail(statesList)
-
+	
 if __name__ == "__main__":
 	main()
