@@ -11,6 +11,10 @@ import decimal
 import operator
 import csv
 import os
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib
+import getpass
 
 class State():
 	def __init__(self, date, state, positiveCases, negative, currentHosp, totalHosp, currentICU, totalICU,
@@ -89,6 +93,25 @@ def displayData(choice, statesList):
 		for s in statesList:
 			print(s.state + ": "  + s.positiveCases)
 
+def sendEmail(statesList):
+	for s in statesList:
+		if s.state == "OR":
+			message = (s.state + ": " + s.positiveCases + " cases in Oregon on " + s.date)
+
+	sender_email = "TheCovid19Analyzer@gmail.com"
+	receiver_email = "danielmcjones@gmail.com"
+	password = "Nocovid4me2"
+	s = smtplib.SMTP(host='smtp.gmail.com', port=587)
+	s.starttls()
+	s.login(sender_email, password)
+	msg = MIMEMultipart()
+	msg['From'] = sender_email
+	msg['To'] = receiver_email
+	msg['Subject']= "Daily update for Covid-19 Cases by state"
+	msg.attach(MIMEText(message, 'plain'))
+	s.send_message(msg)
+	del msg
+
 def main():
 	statesList = []
 	choice = '15'
@@ -101,6 +124,7 @@ def main():
 	while choice != '0':
 		choice = userMenu() 
 		displayData(choice, statesList)
+		sendEmail(statesList)
 
 if __name__ == "__main__":
 	main()
