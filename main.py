@@ -1,6 +1,6 @@
 # Author: Daniel Jones
 # Date: 8/27/2020
-# Description: Small python3 program demonstrating the use of API calls as well as sorting/categorizing data
+# Description: Python 3 program demonstrating the use of API calls as well as sorting/categorizing data
 # to take a look COVID-19 statistics through the United States. 
 # Sources cited:
 # https://realpython.com/python-requests/#the-get-request
@@ -9,7 +9,6 @@ from requests.exceptions import HTTPError
 import csv
 import decimal
 import operator
-import json
 import csv
 import os
 
@@ -31,11 +30,13 @@ class State():
 
 def checkResponse(resp):
 	if resp:
-		print("Successful GET request.")
+		return True
 	else:
-		print("Endpoint not found.")
-	return resp
+		return False
 
+def noEndpoint():
+	print("Endpoint not found... Exiting")
+	exit()
 
 def getPath(resp):
 	path = os.path.join(os.getenv('USERPROFILE'), 'Downloads\current.csv')
@@ -55,17 +56,51 @@ def initStates(fileObject, statesList):
 				counter += 1
 	return statesList
 
-def userMenu(fileObject, statesList):
-	tempVar = 2
-	
+
+def welcomeScreen():
+	print(""" _   _  _____    _____            _     _             ___              _                    
+| | | |/  ___|  /  __ \          (_)   | |           / _ \            | |                   
+| | | |\ `--.   | /  \/ _____   ___  __| |  ______  / /_\ \_ __   __ _| |_   _ _______ _ __ 
+| | | | `--. \  | |    / _ \ \ / / |/ _` | |______| |  _  | '_ \ / _` | | | | |_  / _ \ '__|
+| |_| |/\__/ /  | \__/\ (_) \ V /| | (_| |          | | | | | | | (_| | | |_| |/ /  __/ |   
+ \___(_)____(_)  \____/\___/ \_/ |_|\__,_|          \_| |_/_| |_|\__,_|_|\__, /___\___|_|   
+                                                                          __/ |             
+                                                                         |___/          """)
+def userMenu():
+		
+		print("                                       MAIN MENU                               ")
+		print("1) Total Cases (All states)")
+		print("2) Negative Tests (All states)")
+		print("3) Currently Hospitalized (All states)")
+		print("4) Total Hospitalized (All states)")
+		print("5) Current in ICU (All states)")
+		print("6) Total in ICU (All states)")
+		print("7) Total Recovered (All states)")
+		print("8) Total Hospitalized (All states)")
+		print("9) Total Deaths (All states)")
+		print("10) Total Deaths (All states)")
+		print("11) Choose a state to analyze")
+		print("0) Exit the analyzer")
+		choice = input("--> ")
+		return choice
+
+def displayData(choice, statesList):
+	if choice == '1':
+		for s in statesList:
+			print(s.state + ": "  + s.positiveCases)
+
 def main():
 	statesList = []
+	choice = '15'
 	resp = requests.get('https://api.covidtracking.com/v1/states/current.csv')
-	checkResponse(resp)
+	if (not checkResponse(resp)):
+		noEndpoint()
 	fileObject = open(getPath(resp), "r")
 	initStates(fileObject, statesList)
-	userMenu(fileObject, statesList)
-
+	welcomeScreen()
+	while choice != '0':
+		choice = userMenu() 
+		displayData(choice, statesList)
 
 if __name__ == "__main__":
 	main()
