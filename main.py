@@ -1,9 +1,17 @@
 # Author: Daniel Jones
 # Date: 8/27/2020
 # Description: Python 3 program demonstrating the use of API calls as well as sorting/categorizing data
-# to take a look COVID-19 statistics through the United States. 
+# to take a look COVID-19 statistics through the United States. Also you can send the information to your personal
+# email account.
 # Sources cited:
 # https://realpython.com/python-requests/#the-get-request
+# https://hotter.io/docs/email-accounts/secure-app-gmail/
+# https://stackoverflow.com/questions/17759860/python-2-smtpserverdisconnected-connection-unexpectedly-closed
+# https://realpython.com/python-send-email/
+# https://trinket.io/python/593ce29761
+# https://docs.python.org/3/library/smtplib.html#smtplib.SMTP
+# http://patorjk.com/software/taag/#p=display&v=2&f=Doom&t=Main%20Menu
+
 import requests
 from requests.exceptions import HTTPError
 import csv
@@ -16,6 +24,7 @@ from email.mime.text import MIMEText
 import smtplib
 import getpass
 
+# Setting up the State object to save the data from the API
 class State():
 	def __init__(self, date, state, positiveCases, negative, currentHosp, totalHosp, currentICU, totalICU,
 					recovered, dataGrade, deaths, totalTests):
@@ -32,20 +41,25 @@ class State():
 		self.deaths = deaths
 		self.totalTests = totalTests
 
+# Simple error handling to make sure the response is good
 def checkResponse(resp):
 	if resp:
 		return True
 	else:
 		return False
 
+# Checks to make sure the API is still up
 def noEndpoint():
 	print("Endpoint not found... Exiting")
 	exit()
-
+# Allows users to get the information extracted from their file in the Downloads directory
+# IMPORTANT: If for some reason you've changed the default of where downloads are saved, the
+# 'Downloads' part will need to be chnaged in the below code.
 def getPath(resp):
 	path = os.path.join(os.getenv('USERPROFILE'), 'Downloads\current.csv')
 	return path
 
+# Getting the information from the .csv file into the State object
 def initStates(fileObject, statesList):
 	startLine = 1
 	currentLine = 1
@@ -55,6 +69,7 @@ def initStates(fileObject, statesList):
 		else:
 			readCSV = csv.reader(fileObject, delimiter=',')
 			counter = 1
+			# Adding data from each category into an array for each state
 			for row in readCSV:
 				statesList.append( State(row[0], row[1], row[2], row[3], row[5], row[6], row[7], row[8], row[11], row[12], row[16], row[19]))
 				counter += 1
@@ -71,6 +86,7 @@ def welcomeScreen():
                                                                           __/ |             
                                                                          |___/          """)
 def userMenu():
+	# Main menu where the user can see different information
 		print("\n\n                                       MAIN MENU                               \n\n")
 		print("1) Total Cases (All states)")
 		print("2) Negative Tests (All states)")
@@ -87,6 +103,7 @@ def userMenu():
 		choice = input("--> ")
 		return choice
 
+# Function used after a user makes a choice on which data they want to see
 def displayData(choice, statesList):
 	if choice == '1':
 		for s in statesList:
@@ -99,11 +116,12 @@ def displayData(choice, statesList):
 			receiver_email = input("Please enter your email: ")
 			sendEmail(statesList, receiver_email, message)
  
-
+# Sends an email to the user with the email they entered as well as what they want emailed to them
+# Need to figure out a way to have email hardcoded, but not in plaintext so users can see
 def sendEmail(statesList, receiver_email, message):
 	sender_email = "TheCovid19Analyzer@gmail.com"
 	receiver_email = receiver_email
-	password = "Nocovid4me2"
+	password = getpass.getpass("Sender's Password: ")
 	s = smtplib.SMTP(host='smtp.gmail.com', port=587)
 	s.starttls()
 	s.login(sender_email, password)
@@ -115,6 +133,7 @@ def sendEmail(statesList, receiver_email, message):
 	s.send_message(msg)
 	del msg
 
+# This is where the API gets called originally, and the other functions are called to get things done
 def main():
 	statesList = []
 	choice = '15'
