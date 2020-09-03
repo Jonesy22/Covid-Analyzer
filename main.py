@@ -322,8 +322,6 @@ def main():
 			totalDeaths(statesList)
 		elif choice == '9':
 			analyzeState(statesList)
-		elif choice == '11':
-			print("Choice 2 chosen")
 	print("Thank you for using the Covid-Analyzer!")
 if __name__ == "__main__":
 	main()
