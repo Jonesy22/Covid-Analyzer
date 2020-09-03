@@ -13,6 +13,8 @@
 # http://patorjk.com/software/taag/#p=display&v=2&f=Doom&t=Main%20Menu
 
 import requests
+import json
+from collections import namedtuple
 from requests.exceptions import HTTPError
 import csv
 import decimal
@@ -52,6 +54,7 @@ def checkResponse(resp):
 def noEndpoint():
 	print("Endpoint not found... Exiting")
 	exit()
+
 # Allows users to get the information extracted from their file in the Downloads directory
 # IMPORTANT: If for some reason you've changed the default of where downloads are saved, the
 # 'Downloads' part will need to be chnaged in the below code.
@@ -104,31 +107,43 @@ def userMenu():
 		return choice
 
 # Function used after a user makes a choice on which data they want to see
-def displayData(choice, statesList):
-	if choice == '1':
+def displayTotalCases(statesList):
+	subj = "\n---Total Cases by state---\n"
+	print(subj)
+	for s in statesList:
+		print(s.state + ": "  + s.positiveCases + " cases as of " + s.date + '\n')
+	yesOrNo = input("\nWould you like to receive an email with this information? (Y/N): ").lower()
+	if yesOrNo == "y":
+		message = ''
 		for s in statesList:
-			print(s.state + ": "  + s.positiveCases)
-		yesOrNo = input("Would you like to receive an email with this information? (Y/N): ").lower()
-		if yesOrNo == "y":
-			message = ''
-			for s in statesList:
-				message += (s.state + ": " + s.positiveCases + " cases as of " + s.date + '\n')
-			receiver_email = input("Please enter your email: ")
-			sendEmail(statesList, receiver_email, message)
+			message += (s.state + ": " + s.positiveCases + " cases as of " + s.date + '\n')
+		sendEmail(statesList, message, subj)
  
+def displayNegTests(statesList):
+	subj = "\n---Negative Tests by state---\n"
+	print(subj)
+	for s in statesList:
+		print(s.state + ": "  + s.negativeCases)
+	yesOrNo = input("\nWould you like to receive an email with this information? (Y/N): ").lower()
+	if yesOrNo == "y":
+		message = ''
+		for s in statesList:
+			message += (s.state + ": " + s.negativeCases + " negative tests as of " + s.date + '\n')
+		sendEmail(statesList, message, subj)
+
 # Sends an email to the user with the email they entered as well as what they want emailed to them
 # Need to figure out a way to have email hardcoded, but not in plaintext so users can see
-def sendEmail(statesList, receiver_email, message):
+def sendEmail(statesList, message, subj):
 	sender_email = "TheCovid19Analyzer@gmail.com"
-	receiver_email = receiver_email
+	receiver_email = input("Please enter your email: ")
 	password = getpass.getpass("Sender's Password: ")
 	s = smtplib.SMTP(host='smtp.gmail.com', port=587)
 	s.starttls()
-	s.login(sender_email, password)
+	login = s.login(sender_email, password)
 	msg = MIMEMultipart()
 	msg['From'] = sender_email
 	msg['To'] = receiver_email
-	msg['Subject']= "Daily update for Covid-19 Cases by state"
+	msg['Subject'] = "COVID-19 Analyzer Results"
 	msg.attach(MIMEText(message, 'plain'))
 	s.send_message(msg)
 	del msg
@@ -145,7 +160,26 @@ def main():
 	welcomeScreen()
 	while choice != '0':
 		choice = userMenu() 
-		displayData(choice, statesList)
-	
+		if choice == '1':
+			displayTotalCases(statesList)
+		elif choice == '2':
+			displayNegTests(statesList)
+		elif choice == '3':
+			print("Choice 2 chosen")
+		elif choice == '4':
+			print("Choice 2 chosen")
+		elif choice == '5':
+			print("Choice 2 chosen")
+		elif choice == '6':
+			print("Choice 2 chosen")
+		elif choice == '7':
+			print("Choice 2 chosen")
+		elif choice == '8':
+			print("Choice 2 chosen")
+		elif choice == '9':
+			print("Choice 2 chosen")
+		elif choice == '11':
+			print("Choice 2 chosen")
+	print("Thank you for using the Covid-Analyzer!")
 if __name__ == "__main__":
 	main()
