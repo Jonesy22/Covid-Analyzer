@@ -9,3 +9,8 @@ A program created in Python 3 that analyzes information in each of the 50 United
 
 ## To run
   - Run main.py in a Python IDE or by running it in a terminal with "python3 main.py" without the quotes.
+
+
+### Important Note
+  - Currently just pulls from the .csv that needs to be downloaded on their website. API implementation would be desired.
+ 
